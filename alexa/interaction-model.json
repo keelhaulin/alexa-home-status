@@ -1,0 +1,44 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "home status",
+      "intents": [
+        {
+          "name": "GetHomeStatusIntent",
+          "slots": [],
+          "samples": [
+            "how's the house",
+            "what's the house status",
+            "give me a home summary",
+            "house report"
+          ]
+        },
+        {
+          "name": "GetDetailsIntent",
+          "slots": [
+            {
+              "name": "area",
+              "type": "AMAZON.SearchQuery",
+              "samples": []
+            }
+          ],
+          "samples": [
+            "which lights are on",
+            "which doors are open",
+            "which lights are on in {area}",
+            "which doors are open in {area}",
+            "what lights are on",
+            "what doors are open",
+            "show me details",
+            "details",
+            "details for {area}"
+          ]
+        },
+        { "name": "AMAZON.HelpIntent", "samples": [] },
+        { "name": "AMAZON.CancelIntent", "samples": [] },
+        { "name": "AMAZON.StopIntent", "samples": [] }
+      ],
+      "types": []
+    }
+  }
+}
