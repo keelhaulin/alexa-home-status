@@ -1,18 +1,22 @@
 # Alexa Home Status Skill (Home Assistant + GetDetailsIntent)
 
 ## Overview
-Private Alexa skill that speaks a dynamic home status from Home Assistant and answers follow‑ups like:
-- “**How’s the house?**”
-- “**Which lights are on?**”
-- “**Which doors are open?**”
-- “**Which lights are on in the kitchen?**” (area‑filtered)
+
+Private Alexa skill that speaks a dynamic home status from Home Assistant and answers follow-ups like:
+
+- **“How’s the house?”**
+- **“Which lights are on?”**
+- **“Which doors are open?”**
+- **“Which lights are on in the kitchen?”** (area-filtered)
 
 ## Goals
+
 - Voice summary (“how’s the house?”) driven by HA templates.
 - Details intent to enumerate specific devices.
 - Easy to extend without deep coding.
 
 ## Tech
+
 - Alexa Skills Kit (Custom)
 - AWS Lambda (Node.js 18)
 - Home Assistant + Nabu Casa
@@ -23,11 +27,13 @@ Private Alexa skill that speaks a dynamic home status from Home Assistant and an
 ## Setup
 
 ### 1) Home Assistant templates
+
 Add `home-assistant/house_status_template.yaml` to your HA config and restart. It creates `sensor.house_status_summary`.
 
 Optionally add `home-assistant/areas_example.yaml` if you want **area filtering** and adapt entity lists to your home.
 
 ### 2) Alexa skill (Developer Console)
+
 - Custom Skill → Invocation name: `home status`
 - Intents:
   - `GetHomeStatusIntent` (status)
@@ -35,17 +41,20 @@ Optionally add `home-assistant/areas_example.yaml` if you want **area filtering*
 - Import/Apply the interaction model from `alexa/interaction-model.json` (or copy its parts).
 
 ### 3) Lambda (us-east-1)
+
 - Create function in `us-east-1` (Node.js 18).
 - Upload `lambda/index.js`, set timeout ~7–10s.
-- Env vars (see `.env.example`):
+- Environment variables (see `.env.example`):
   - `HA_BASE_URL`, `HA_TOKEN`, `HA_SENSOR`
   - Optional: `AREA_MAP_JSON` (JSON map of area → arrays of entity_ids)
 
 ### 4) Add trigger & wire endpoint
-- Lambda → Triggers → **Alexa Skills Kit** → paste **Skill ID**.
-- Alexa console → Endpoint → **AWS Lambda ARN** (us‑east‑1) → Save & Build.
+
+- Lambda → **Configuration → Triggers** → Add **Alexa Skills Kit** → paste **Skill ID**.
+- Alexa Developer Console → **Endpoint** → Service Endpoint Type: **AWS Lambda ARN** (`us-east-1`) → Save & Build.
 
 ### 5) Test
+
 - “Alexa, open home status.”
 - “How’s the house?”
 - “Which lights are on?”
@@ -54,6 +63,7 @@ Optionally add `home-assistant/areas_example.yaml` if you want **area filtering*
 ---
 
 ## Enhancements
+
 - Add more categories (windows, blinds, fans) in Lambda.
 - Expand SSML for clearer speech.
 - Add proactive announcements (advanced).
@@ -62,7 +72,8 @@ Optionally add `home-assistant/areas_example.yaml` if you want **area filtering*
 ---
 
 ## Security
-- Keep the HA long‑lived token secret and rotate periodically.
+
+- Keep the HA long-lived token secret and rotate periodically.
 - Skill remains **private** in Development stage until you submit for certification.
 
 ---
@@ -75,13 +86,14 @@ alexa-home-status/
 │ ├── index.js
 │ ├── package.json
 │ └── .env.example
-├── home-assistant/ # HA template sensor definition
-│ └── house_status_template.yaml
+├── home-assistant/ # HA template sensor definitions
+│ ├── house_status_template.yaml
 │ └── areas_example.yaml
+└── alexa/
 └── interaction-model.json
 
-
 ### `home-assistant/house_status_template.yaml`
+
 Creates the main summary sensor. Tweak entities/phrasing to taste.
 
 ```yaml
@@ -126,5 +138,3 @@ template:
             {% set _ = parts.append(humidity ~ ' percent humidity') %}
           {% endif %}
           {{ parts | reject('equalto','') | list | join('. ') }}.
-
-
