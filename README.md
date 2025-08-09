@@ -78,7 +78,6 @@ alexa-home-status/
 ├── home-assistant/ # HA template sensor definition
 │ └── house_status_template.yaml
 │ └── areas_example.yaml
-└── alexa/ # Alexa interaction model
 └── interaction-model.json
 
 
