@@ -1,0 +1,12 @@
+# This file is documentation-only. Copy these mappings into a JSON env var instead (AREA_MAP_JSON).
+# Example dictionary you'd put into Lambda env var AREA_MAP_JSON:
+{
+  "kitchen": {
+    "lights": ["light.kitchen_ceiling", "light.kitchen_pendants"],
+    "doors":  ["binary_sensor.kitchen_back_door"]
+   },
+  "living room": {
+    "lights": ["light.living_room_lamp", "light.living_room_ceiling"],
+    "doors":  ["binary_sensor.patio_door"]
+   }
+ }

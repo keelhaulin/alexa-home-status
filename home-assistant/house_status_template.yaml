@@ -1,0 +1,56 @@
+## Step-by-Step Setup
+
+### 1. Prerequisites
+- Home Assistant with Nabu Casa subscription.
+- Long-lived access token from HA (Profile → Security).
+- Amazon Developer Account.
+- AWS account with Lambda permissions.
+
+---
+
+### 2. Create Home Assistant Template Sensor
+Add `home-assistant/house_status_template.yaml` to your HA config:
+
+```yaml
+# home-assistant/house_status_template.yaml
+template:
+  - sensor:
+      - name: house_status_summary
+        state: >
+          {% set lights_on = states.light | selectattr('state','eq','on') | list | count %}
+          {% set doors_open = states.binary_sensor
+              | selectattr('attributes.device_class','defined')
+              | selectattr('attributes.device_class','in',['door','opening'])
+              | selectattr('state','eq','on') | list | count %}
+          {% set windows_open = states.binary_sensor
+              | selectattr('attributes.device_class','defined')
+              | selectattr('attributes.device_class','in',['window'])
+              | selectattr('state','eq','on') | list | count %}
+          {% set garage_open = states('binary_sensor.garage_door') == 'on' %}
+          {% set alarm = states('alarm_control_panel.home_alarm') %}
+          {% set inside = states('sensor.upstairs_temperature') | default('unknown') %}
+          {% set humidity = states('sensor.upstairs_humidity') | default('unknown') %}
+          {% set parts = [] %}
+          {% if lights_on > 0 %}
+            {% set _ = parts.append(lights_on ~ ' light' ~ ('s' if lights_on != 1 else '') ~ ' on') %}
+          {% else %}
+            {% set _ = parts.append('all lights off') %}
+          {% endif %}
+          {% if doors_open > 0 or windows_open > 0 %}
+            {% set _ = parts.append(doors_open ~ ' door' ~ ('s' if doors_open != 1 else '') ~ ' open, ' ~ windows_open ~ ' window' ~ ('s' if windows_open != 1 else '') ~ ' open') %}
+          {% else %}
+            {% set _ = parts.append('all doors and windows closed') %}
+          {% endif %}
+          {% if garage_open %}{% set _ = parts.append('garage is open') %}{% endif %}
+          {% if alarm in ['armed_home','armed_away'] %}
+            {% set _ = parts.append('security is armed') %}
+          {% elif alarm == 'disarmed' %}
+            {% set _ = parts.append('security is disarmed') %}
+          {% endif %}
+          {% if inside != 'unknown' %}
+            {% set _ = parts.append('inside ' ~ inside ~ ' degrees') %}
+          {% endif %}
+          {% if humidity != 'unknown' %}
+            {% set _ = parts.append(humidity ~ ' percent humidity') %}
+          {% endif %}
+          {{ parts | reject('equalto','') | list | join('. ') }}.

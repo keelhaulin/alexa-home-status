@@ -1,0 +1,10 @@
+{
+  "name": "alexa-home-status",
+  "version": "1.0.0",
+  "description": "Alexa skill to read Home Assistant home status via Nabu Casa",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "ask-sdk-core": "^2.12.1"
+  }
+}
